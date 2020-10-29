@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: apache-wp
+  labels:
+      name: apache-service
+      app: apache-wp-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30004
+  selector:
+    app: apache-wp
+    type: front-end
+    

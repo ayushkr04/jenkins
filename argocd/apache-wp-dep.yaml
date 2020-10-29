@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-wp
+  labels:
+    app: apache-wp
+    type: front-end
+spec:
+  replicas: 1
+  selector:
+      matchLabels:
+        type: front-end
+  template:
+    metadata:
+      name: wordpress
+      labels:
+        app: apache-wp
+        env: production
+        type: front-end
+    spec:
+      containers:
+        - name: apache-php
+          image: httpd
+          ports:
+              - containerPort: 80
+
