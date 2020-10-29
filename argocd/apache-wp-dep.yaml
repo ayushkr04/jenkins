@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: apache-php
-          image: httpd
+          image: tiangolo/node-frontend
           ports:
               - containerPort: 80
 
