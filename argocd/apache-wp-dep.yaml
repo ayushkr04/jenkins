@@ -28,6 +28,6 @@ spec:
   strategy:
 # --- Everything above this comment are the same as a deployment ---
     blueGreen: # A new field for the Blue Green strategy options
-      previewService: apache-service # Reference to a service
-      activeService: apache-service # Reference to a service
+      previewService: apache-wp # Reference to a service
+      activeService: apache-wp # Reference to a service
 
