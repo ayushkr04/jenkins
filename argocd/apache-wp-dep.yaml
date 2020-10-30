@@ -1,47 +1,56 @@
-# This example demonstrates a Rollout using the blue-green update strategy, which contains a manual
-# gate before promoting the new stack.
+# This example demonstrates how to deploy a preview ReplicaSet using an Experiment. The preview
+# ReplicaSet will run but receive no production traffic, since its selector labels are set
+# differently than the rollout's selector labels.
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
-  name: rollout-bluegreen
+  name: rollout-canary-preview
 spec:
-  replicas: 2
+  replicas: 3
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      app: rollout-bluegreen
+      app: rollout-canary-production
   template:
     metadata:
       labels:
-        app: rollout-bluegreen
+        app: rollout-canary-production
     spec:
       containers:
       - name: rollouts-demo
-        image: argoproj/rollouts-demo:green
+        image: argoproj/rollouts-demo:blue
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
   strategy:
-# --- Everything above this comment are the same as a deployment ---
-    canary: # A new field for configurable Canary options
-      maxSurge: "10%"
-      maxUnavailable: 0
+    canary:
       steps:
-      - setWeight: 10
-      - pause:
-          duration: 30 #seconds
-      - setWeight: 50
-      - pause: {}
+      # The initial step starts an experiment that runs a single pod ReplicaSet using the new pod spec
+      # When the experiment is terminated, the rollout will progress through rest of the canary steps.
+      - experiment:
+          templates:
+          - name: canary-preview
+            specRef: canary
+            # Selector and metadata are overwritten to be something different from the rollout's
+            # spec.selector. This allows the preview stack to be reachable through a different
+            # service without receiving production traffic.
+            selector:
+              matchLabels:
+                app: rollout-canary-preview
+            metadata:
+              labels:
+                app: rollout-canary-preview
 
 ---
+# The rollout-canary-preview service will point to the preview stack, making them reachable without
+# exposing them to production traffic.
 kind: Service
 apiVersion: v1
 metadata:
-  name: rollout-bluegreen-active
+  name: rollout-canary-preview
 spec:
-  type: LoadBalancer
   selector:
-    app: rollout-bluegreen
+    app: rollout-canary-preview
   ports:
   - protocol: TCP
     port: 80
@@ -51,15 +60,11 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: rollout-bluegreen-preview
+  name: rollout-canary-production
 spec:
-  type: LoadBalancer
   selector:
-    app: rollout-bluegreen
+    app: rollout-canary-production
   ports:
   - protocol: TCP
     port: 80
     targetPort: 8080
-
-
-    
