@@ -1,5 +1,5 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout 
 metadata:
   name: apache-wp
   labels:
@@ -21,6 +21,13 @@ spec:
       containers:
         - name: apache-php
           image: bitbull/webserver
-          ports:
-              - containerPort: 80
+    ports:
+        - containerPort: 80
+  minReadySeconds: 30
+  revisionHistoryLimit: 3
+  strategy:
+# --- Everything above this comment are the same as a deployment ---
+    blueGreen: # A new field for the Blue Green strategy options
+      previewService: my-service-preview # Reference to a service
+      activeService: my-service-active # Reference to a service
 
