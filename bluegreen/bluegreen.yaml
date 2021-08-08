@@ -29,7 +29,7 @@ spec:
       
  ---
  
- kind: Service
+kind: Service
 apiVersion: v1
 metadata:
   name: rollout-bluegreen-preview
