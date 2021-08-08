@@ -26,8 +26,6 @@ spec:
       activeService: rollout-bluegreen-active
       previewService: rollout-bluegreen-preview
       autoPromotionEnabled: false
-      
- ---
  
 kind: Service
 apiVersion: v1
@@ -41,7 +39,6 @@ spec:
     port: 80
     targetPort: 8080
 
----
 kind: Service
 apiVersion: v1
 metadata:
