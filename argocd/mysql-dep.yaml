@@ -6,7 +6,7 @@ metadata:
     app: mysql-wp
     type: back-end
 spec:
-    replicas: 2
+    replicas: 3
     selector:
       matchLabels:
         type: back-end
